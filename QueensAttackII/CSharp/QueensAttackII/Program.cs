@@ -1,161 +1,234 @@
 ﻿using System;
 
-class Solution
+public class Queen
 {
+    public int X { get; set; }
+    public int Y { get; set; }
+}
 
-    // Complete the queensAttack function below.
-    static int QueensAttack(int n, int k, int r_q, int c_q, int[][] obstacles)
+public class Obstacle
+{
+    public int X { get; set; }
+    public int Y { get; set; }
+}
+
+public class AttackPointsCalculator
+{
+    private Queen Queen { get; }
+
+    private int TopDist { get; set; }
+    private int RightDist { get; set; }
+    private int BottomDist { get; set; }
+    private int LeftDist { get; set; }
+    private int TopRightDist { get; set; }
+    private int BottomRightDist { get; set; }
+    private int BottomLeftDist { get; set; }
+    private int TopLeftDist { get; set; }
+
+    public AttackPointsCalculator(Queen queen, int boardSize)
     {
-        var topDist = n - r_q;
-        var rightDist = n - c_q;
-        var bottomDist = r_q - 1;
-        var leftDist = c_q - 1;
-        var topRightDist = Math.Min(topDist, rightDist);
-        var bottomRightDist = Math.Min(bottomDist, rightDist);
-        var bottomLeftDist = Math.Min(bottomDist, leftDist);
-        var topLeftDist = Math.Min(topDist, leftDist);
+        Queen = queen;
+        TopDist = boardSize - queen.Y;
+        RightDist = boardSize - queen.X;
+        BottomDist = queen.Y - 1;
+        LeftDist = queen.X - 1;
+        TopRightDist = Math.Min(TopDist, RightDist);
+        BottomRightDist = Math.Min(BottomDist, RightDist);
+        BottomLeftDist = Math.Min(BottomDist, LeftDist);
+        TopLeftDist = Math.Min(TopDist, LeftDist);
+    }
 
-        foreach (var obstacle in obstacles)
+    public void UpdateAttackPoints(Obstacle obstacle)
+    {
+        var obstaclePosition = GetObstaclePosition(obstacle);
+        Calculate(obstaclePosition, obstacle);
+    }
+
+    public int GetTotalAttackPoints()
+    {
+        return 
+            TopDist +
+            RightDist +
+            BottomDist +
+            LeftDist +
+            TopRightDist +
+            BottomRightDist +
+            BottomLeftDist +
+            TopLeftDist;
+    }
+
+    private void Calculate(ObstaclePosition obstaclePosition, Obstacle obstacle)
+    {
+        var distanceFromObstacle = 0;
+        switch (obstaclePosition)
         {
-            var obstacleY = obstacle[0];
-            var obstacleX = obstacle[1];
-
-            // directly above
-            if (obstacleX == c_q && obstacleY > r_q)
-            {
-                var distFromObstacle = obstacleY - r_q - 1;
-                if (distFromObstacle < topDist)
+            case ObstaclePosition.Above:
+                distanceFromObstacle = obstacle.Y - Queen.Y - 1;
+                if (distanceFromObstacle < TopDist)
                 {
-                    topDist = distFromObstacle;
+                    TopDist = distanceFromObstacle;
                 }
-
-                continue;
-            }
-
-            // directly below
-            if (obstacleX == c_q && obstacleY < r_q)
-            {
-                var distanceFromObstacle = r_q - obstacleY - 1;
-                if (distanceFromObstacle < bottomDist)
+                break;
+            case ObstaclePosition.Below:
+                distanceFromObstacle = Queen.Y - obstacle.Y - 1;
+                if (distanceFromObstacle < BottomDist)
                 {
-                    bottomDist = distanceFromObstacle;
+                    BottomDist = distanceFromObstacle;
                 }
-
-                continue;
-            }
-
-            //directly right
-            if (obstacleY == r_q && obstacleX > c_q)
-            {
-                var distanceFromObstacle = obstacleX - c_q - 1;
-                if (distanceFromObstacle < rightDist)
+                break;
+            case ObstaclePosition.Right:
+                distanceFromObstacle = obstacle.X - Queen.X - 1;
+                if (distanceFromObstacle < RightDist)
                 {
-                    rightDist = distanceFromObstacle;
+                    RightDist = distanceFromObstacle;
                 }
-
-                continue;
-            }
-
-            // directly left
-            if (obstacleY == r_q && obstacleX < c_q)
-            {
-                var distanceFromObstacle = c_q - obstacleX - 1;
-                if (distanceFromObstacle < leftDist)
+                break;
+            case ObstaclePosition.Left:
+                distanceFromObstacle = Queen.X - obstacle.X - 1;
+                if (distanceFromObstacle < LeftDist)
                 {
-                    leftDist = distanceFromObstacle;
+                    LeftDist = distanceFromObstacle;
                 }
-
-                continue;
-            }
-
-            // top right
-            if (obstacleY - obstacleX == r_q - c_q &&
-                obstacleY > r_q)
-            {
-                var distanceFromObstacle = obstacleY - r_q - 1;
-                if (distanceFromObstacle < topRightDist)
+                break;
+            case ObstaclePosition.AboveRight:
+                distanceFromObstacle = obstacle.Y - Queen.Y - 1;
+                if (distanceFromObstacle < TopRightDist)
                 {
-                    topRightDist = distanceFromObstacle;
+                    TopRightDist = distanceFromObstacle;
                 }
-
-                continue;
-            }
-
-            // bottom left
-            if (obstacleY - obstacleX == r_q - c_q &&
-                obstacleY < r_q)
-            {
-                var distanceFromObstacle = r_q - obstacleY - 1;
-                if (distanceFromObstacle < bottomLeftDist)
+                break;
+            case ObstaclePosition.BelowLeft:
+                distanceFromObstacle = Queen.Y - obstacle.Y - 1;
+                if (distanceFromObstacle < BottomLeftDist)
                 {
-                    bottomLeftDist = distanceFromObstacle;
+                    BottomLeftDist = distanceFromObstacle;
                 }
-
-                continue;
-            }
-
-            // bottom right
-            if (obstacleX > c_q && obstacleX - c_q == r_q - obstacleY)
-            {
-                var distanceFromObstacle = obstacleX - c_q - 1;
-                if (distanceFromObstacle < bottomRightDist)
+                break;
+            case ObstaclePosition.BelowRight:
+                distanceFromObstacle = obstacle.X - Queen.X - 1;
+                if (distanceFromObstacle < BottomRightDist)
                 {
-                    bottomRightDist = distanceFromObstacle;
+                    BottomRightDist = distanceFromObstacle;
                 }
-
-                continue;
-            }
-
-            // top left
-            if (obstacleX < c_q && c_q - obstacleX == obstacleY - r_q)
-            {
-                var distanceFromObstacle = c_q - obstacleX - 1;
-                if (distanceFromObstacle < topLeftDist)
+                break;
+            case ObstaclePosition.AboveLeft:
+                distanceFromObstacle = Queen.X - obstacle.X - 1;
+                if (distanceFromObstacle < TopLeftDist)
                 {
-                    topLeftDist = distanceFromObstacle;
+                    TopLeftDist = distanceFromObstacle;
                 }
+                break;
+            default:
+                break;
+        }
+    }
 
-                continue;
-            }
+    private ObstaclePosition GetObstaclePosition (Obstacle obstacle)
+    {
+        if (obstacle.X == Queen.X && obstacle.Y > Queen.Y)
+        {
+            return ObstaclePosition.Above;
         }
 
-        return 
-            topDist +
-            rightDist +
-            bottomDist +
-            leftDist +
-            topRightDist +
-            bottomRightDist +
-            bottomLeftDist +
-            topLeftDist;
+        if (obstacle.Y - obstacle.X == Queen.Y - Queen.X && obstacle.Y > Queen.Y)
+        {
+            return ObstaclePosition.AboveRight;
+        }
+
+        if (obstacle.Y == Queen.Y && obstacle.X > Queen.X)
+        {
+            return ObstaclePosition.Right;
+        }
+
+        if (obstacle.X > Queen.X && obstacle.X - Queen.X == Queen.Y - obstacle.Y)
+        {
+            return ObstaclePosition.BelowRight;
+        }
+
+        if (obstacle.X == Queen.X && obstacle.Y < Queen.Y)
+        {
+            return ObstaclePosition.Below;
+        }
+
+        if (obstacle.Y - obstacle.X == Queen.Y - Queen.X && obstacle.Y < Queen.Y)
+        {
+            return ObstaclePosition.BelowLeft;
+        }
+
+        if (obstacle.Y == Queen.Y && obstacle.X < Queen.X)
+        {
+            return ObstaclePosition.Left;
+        }
+
+        if (obstacle.X < Queen.X && Queen.X - obstacle.X == obstacle.Y - Queen.Y)
+        {
+            return ObstaclePosition.AboveLeft;
+        }
+
+        return ObstaclePosition.Irrelevant;
+    }
+}
+
+public enum ObstaclePosition
+{
+    Irrelevant,
+    Above,
+    AboveRight,
+    Right,
+    BelowRight,
+    Below,
+    BelowLeft,
+    Left,
+    AboveLeft
+}
+
+class Solution
+{
+    static int QueensAttack(int boardSize, Queen queen, int[][] obstacles)
+    {
+        var calculator = new AttackPointsCalculator(queen, boardSize);
+        foreach (var o in obstacles)
+        { 
+            var obstacle = new Obstacle
+            {
+                Y = o[0],
+                X = o[1]
+            };
+
+            calculator.UpdateAttackPoints(obstacle);
+        };
+
+        return calculator.GetTotalAttackPoints();
     }
 
     static void Main(string[] args)
     {
-        //TextWriter textWriter = new StreamWriter(Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
-
-
-
         string[] nk = Console.ReadLine().Split(' ');
 
-        int n = Convert.ToInt32(nk[0]);
+        int boardSize = Convert.ToInt32(nk[0]);
 
-        int k = Convert.ToInt32(nk[1]);
+        int numberOfObstacles = Convert.ToInt32(nk[1]);
 
-        string[] r_qC_q = Console.ReadLine().Split(' ');
+        string[] queenPosition = Console.ReadLine().Split(' ');
 
-        int r_q = Convert.ToInt32(r_qC_q[0]);
+        int queenY = Convert.ToInt32(queenPosition[0]);
 
-        int c_q = Convert.ToInt32(r_qC_q[1]);
+        int queenX = Convert.ToInt32(queenPosition[1]);
 
-        int[][] obstacles = new int[k][];
+        int[][] obstacles = new int[numberOfObstacles][];
 
-        for (int i = 0; i < k; i++)
+        for (int i = 0; i < numberOfObstacles; i++)
         {
             obstacles[i] = Array.ConvertAll(Console.ReadLine().Split(' '), obstaclesTemp => Convert.ToInt32(obstaclesTemp));
         }
 
-        int result = QueensAttack(n, k, r_q, c_q, obstacles);
+        var queenCoordinates = new Queen
+        {
+            X = queenX,
+            Y = queenY
+        };
+
+        int result = QueensAttack(boardSize, queenCoordinates, obstacles);
 
         Console.WriteLine(result);
 
