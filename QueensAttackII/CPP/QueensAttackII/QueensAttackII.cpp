@@ -49,7 +49,7 @@ public:
 class AttackPointsCalculator
 {
 private:
-	Queen &queen;
+	Queen const& queen;
 
 	int topDist;
 	int rightDist;
@@ -59,7 +59,7 @@ private:
 	int bottomRightDist;
 	int bottomLeftDist;
 	int topLeftDist;
-	ObstaclePosition GetObstaclePosition(Obstacle const &obstacle)
+	ObstaclePosition GetObstaclePosition(Obstacle const& obstacle)
 	{
 		if (obstacle.x == queen.x && obstacle.y > queen.y)
 		{
@@ -103,7 +103,7 @@ private:
 
 		return Irrelevant;
 	};
-	void Calculate(ObstaclePosition const obstaclePosition, Obstacle const &obstacle)
+	void Calculate(ObstaclePosition const& obstaclePosition, Obstacle const& obstacle)
 	{
 		int distanceFromObstacle = 0;
 		switch (obstaclePosition)
@@ -170,7 +170,7 @@ private:
 	};
 
 public:
-	AttackPointsCalculator(Queen &queen, int const boardSize)
+	AttackPointsCalculator(Queen const& queen, int const boardSize)
 		:
 		queen(queen),
 		topDist(boardSize - queen.y),
@@ -194,7 +194,7 @@ public:
 			bottomLeftDist +
 			topLeftDist;
 	};
-	void UpdateAttackPoints(Obstacle const &obstacle)
+	void UpdateAttackPoints(Obstacle const& obstacle)
 	{
 		auto obstaclePosition = GetObstaclePosition(obstacle);
 		Calculate(obstaclePosition, obstacle);
