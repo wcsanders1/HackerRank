@@ -1,14 +1,27 @@
-﻿// Learn more about F# at http://fsharp.org
+﻿open System
 
-open System
+let (|Spring|Summer|) i =
+    if i % 2 = 0 then Summer else Spring
 
-let square x = x * x
+let calculateGrowth cycles =
+    let rec grow cycle height = 
+        match cycle with
+        | 0 -> height
+        | Summer -> (grow (cycle - 1) (height)) + 1
+        | Spring -> (grow (cycle - 1) (height)) * 2
+    grow cycles 1
+
+let getCycles cycleNum =
+    let rec calc num cases = 
+        if num = 0 then cases else calc (num - 1) (int(Console.ReadLine()) :: cases)
+    calc cycleNum []
 
 [<EntryPoint>]
-let main argv =
-    let strNumber = Console.ReadLine();
-    let (_, number) = Int32.TryParse strNumber
-
-    Console.WriteLine(square number)
-    Console.ReadKey();
-    0 // return an integer exit code
+let main _ =
+    let cycleNums = List.rev (getCycles (int(Console.ReadLine())))
+    for cycleNum in cycleNums do
+        let solution = calculateGrowth cycleNum
+        printf "%d\n" solution
+    
+    Console.ReadKey() |> ignore;
+    0
