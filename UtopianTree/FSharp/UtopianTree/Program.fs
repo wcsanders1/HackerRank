@@ -3,7 +3,7 @@
 let (|Spring|Summer|) i =
     if i % 2 = 0 then Summer else Spring
 
-let calculateGrowth cycles =
+let (|>|-=-|<|) cycles =
     let rec grow cycle height = 
         match cycle with
         | 0 -> height
@@ -20,7 +20,7 @@ let getCycles cycleNum =
 let main _ =
     let cycleNums = List.rev (getCycles (int(Console.ReadLine())))
     for cycleNum in cycleNums do
-        let solution = calculateGrowth cycleNum
+        let solution = (|>|-=-|<|) cycleNum
         printf "%d\n" solution
     
     Console.ReadKey() |> ignore;
