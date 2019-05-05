@@ -1,20 +1,88 @@
-// AngryProfessor.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+vector<string> split_string(string);
+
+string angryProfessor(int k, vector<int> a) {
+	auto lateStudents = 0;
+	for (auto& time : a)
+	{
+		if (time > 0)
+		{
+			lateStudents++;
+		}
+	}
+
+	return a.size() - lateStudents < k ? "YES" : "NO";
+}
 
 int main()
 {
-    std::cout << "Hello World!\n"; 
+	int t;
+	cin >> t;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+	for (int t_itr = 0; t_itr < t; t_itr++) {
+		string nk_temp;
+		getline(cin, nk_temp);
+
+		vector<string> nk = split_string(nk_temp);
+
+		int n = stoi(nk[0]);
+
+		int k = stoi(nk[1]);
+
+		string a_temp_temp;
+		getline(cin, a_temp_temp);
+
+		vector<string> a_temp = split_string(a_temp_temp);
+
+		vector<int> a(n);
+
+		for (int i = 0; i < n; i++) {
+			int a_item = stoi(a_temp[i]);
+
+			a[i] = a_item;
+		}
+
+		string result = angryProfessor(k, a);
+
+		cout << result << "\n";
+	}
+
+	return 0;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
+vector<string> split_string(string input_string) 
+{
+	string::iterator new_end = unique(input_string.begin(), input_string.end(), [](const char &x, const char &y) {
+		return x == y and x == ' ';
+		});
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+	input_string.erase(new_end, input_string.end());
+
+	while (input_string[input_string.length() - 1] == ' ') {
+		input_string.pop_back();
+	}
+
+	vector<string> splits;
+	char delimiter = ' ';
+
+	size_t i = 0;
+	size_t pos = input_string.find(delimiter);
+
+	while (pos != string::npos) {
+		splits.push_back(input_string.substr(i, pos - i));
+
+		i = pos + 1;
+		pos = input_string.find(delimiter, i);
+	}
+
+	splits.push_back(input_string.substr(i, min(pos, input_string.length()) - i + 1));
+
+	return splits;
+}
