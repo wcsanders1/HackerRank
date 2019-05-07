@@ -4,9 +4,9 @@
 
 let getContainers() = 
     let numberOfBuckets = stdin.ReadLine() |> int
-    let containers:int[,] = Array2D.zeroCreate numberOfBuckets numberOfBuckets
+    let containers = Array2D.zeroCreate numberOfBuckets numberOfBuckets
     let rec f bucket = 
-        if bucket > numberOfBuckets
+        if bucket >= numberOfBuckets
         then containers
         else 
             let container = getContainer()
@@ -17,13 +17,26 @@ let getContainers() =
 
 let getCases caseNum =
     let rec f case cases =
-        if case > caseNum
+        if case >= caseNum
         then cases
         else f (case + 1) (getContainers() :: cases)
-    f 0 []
+    f 0 [] |> List.rev
+
+let ballsInEachContainer (container:int[,]) =
+    let numberOfBuckets = container.[0,*].Length
+    let rec getTotals bucket (totalInBuckets, totalColors)  =
+        if bucket >= numberOfBuckets
+        then (totalInBuckets, totalColors)
+        else
+            let bucketTotal = container.[bucket,*]
+            let colorTotal = container.[*,bucket]
+            getTotals (bucket + 1) ((bucketTotal :: totalInBuckets), (colorTotal :: totalColors))
+    getTotals 0 ([], [])
 
 [<EntryPoint>]
 let main argv =
-    let cases = getCases (stdin.ReadLine() |> int)
+    let containers = getCases (stdin.ReadLine() |> int)
+    //let totals = ballsInEachContainer (containers |> List.toArray)
+    stdout.WriteLine("Done")
     0
 
