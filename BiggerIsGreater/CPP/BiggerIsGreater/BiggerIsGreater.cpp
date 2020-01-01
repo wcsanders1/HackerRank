@@ -6,6 +6,8 @@ using namespace std;
 
 const string NoAnswer = "no answer";
 
+// NOTE: This problem can easily be solved using next_permutation instead of the code below...
+
 string biggerIsGreater(string problem)
 {
     auto problemLength = problem.length();
@@ -56,13 +58,12 @@ string biggerIsGreater(string problem)
                 break;
             }
         }
+ 
         replacementVector.erase(replacementVector.begin() + deleteIndex);
         replacementVector.push_back(replacedChar);
-
         sort(replacementVector.begin(), replacementVector.end());
 
         vector<char> vectorAnswer(charVector.begin(), charVector.begin() + replacementIndex + 1);
-
         vectorAnswer.insert(vectorAnswer.end(), replacementVector.begin(), replacementVector.end());
 
         return string(vectorAnswer.begin(), vectorAnswer.end());
