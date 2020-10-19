@@ -1,8 +1,4 @@
-#include <cmath>
-#include <cstdio>
-#include <vector>
 #include <iostream>
-#include <algorithm>
 #include <string>
 
 using namespace std;
@@ -24,17 +20,22 @@ private:
         }
     };
 
-    Node Root;
     Node *Current;
 
 public:
     int Count;
+
+    Stack()
+    {
+        Count = 0;
+        Current = nullptr;
+    }
+
     void Push(int value)
     {
         if (Count == 0)
         {
-            Root.Value = value;
-            Current = &Root;
+            Current = new Node(value);
         }
         else
         {
@@ -56,8 +57,16 @@ public:
 
         Count--;
         int value = Current->Value;
-        Current = Current->Previous;
-        delete Current->Next;
+
+        if (!Count)
+        {
+            delete Current;
+        }
+        else
+        {
+            Current = Current->Previous;
+            delete Current->Next;
+        }
 
         return value;
     }
@@ -78,7 +87,8 @@ int main()
     int cases;
     cin >> cases;
 
-    Stack stackOne;
+    Stack pushStack;
+    Stack popStack;
 
     for (int i = 0; i < cases; i++)
     {
@@ -92,14 +102,28 @@ int main()
         case 1:
         {
             int num = stoi(c.substr(c.find(" ") + 1, c.size() - 1));
-            stackOne.Push(num);
+            pushStack.Push(num);
         }
         break;
         case 2:
-            cout << stackOne.Pop();
+            if (!popStack.Count)
+            {
+                while (pushStack.Count)
+                {
+                    popStack.Push(pushStack.Pop());
+                }
+            }
+            popStack.Pop();
             break;
         case 3:
-            cout << stackOne.Peek();
+            if (!popStack.Count)
+            {
+                while (pushStack.Count)
+                {
+                    popStack.Push(pushStack.Pop());
+                }
+            }
+            cout << popStack.Peek() << "\n";
             break;
         }
     }
