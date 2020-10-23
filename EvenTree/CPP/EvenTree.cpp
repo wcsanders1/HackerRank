@@ -1,12 +1,54 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
-// Complete the evenForest function below.
-int evenForest(int nodes, int edges, vector<int> *from, vector<int> *to)
+class Node
 {
+public:
+    Node(int value)
+    {
+        Value = value;
+    }
+    int Value;
+    vector<Node *> Children;
+};
+
+Node *getOrCreateNode(int value, map<int, Node *> &nodesMap)
+{
+    map<int, Node *>::iterator it;
+    it = nodesMap.find(value);
+
+    if (it == nodesMap.end())
+    {
+        Node *newNode = new Node(value);
+        nodesMap[value] = newNode;
+
+        return newNode;
+    }
+
+    return it->second;
+}
+
+int evenForest(int nodes, int edges, vector<int> &from, vector<int> &to)
+{
+    map<int, Node *> nodesMap;
+
+    Node *root = new Node(1);
+    nodesMap[1] = root;
+
+    int index = 0;
+    vector<int>::iterator intIterator;
+    for (intIterator = from.begin(); intIterator != from.end(); intIterator++, index++)
+    {
+        Node *child = getOrCreateNode(from[index], nodesMap);
+        Node *parent = getOrCreateNode(to[index], nodesMap);
+
+        parent->Children.push_back(child);
+    }
+
     return 0;
 }
 
@@ -32,7 +74,7 @@ int main()
         to[i] = stoi(fromTo.substr(space + 1, fromTo.size() - 1));
     }
 
-    int res = evenForest(nodes, edges, &from, &to);
+    int res = evenForest(nodes, edges, from, to);
 
     cout << res << "\n";
 
