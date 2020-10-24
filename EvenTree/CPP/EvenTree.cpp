@@ -32,6 +32,43 @@ Node *getOrCreateNode(int value, map<int, Node *> &nodesMap)
     return it->second;
 }
 
+int getEvenSubtrees(Node *node)
+{
+    if (!node)
+    {
+        return 0;
+    }
+
+    if (node->Children.empty())
+    {
+        node->Value = 0;
+
+        return 0;
+    }
+
+    int evenSubtrees = 0;
+    int totalChildren = 0;
+
+    for (Node *subnode : node->Children)
+    {
+        evenSubtrees += getEvenSubtrees(subnode);
+
+        if (subnode->Value > 1 && subnode->Value % 2 == 0)
+        {
+            evenSubtrees++;
+            subnode->Value = 0;
+        }
+        else
+        {
+            totalChildren += subnode->Value + 1;
+        }
+    }
+
+    node->Value = totalChildren;
+
+    return evenSubtrees;
+}
+
 int evenForest(int nodes, int edges, vector<int> &from, vector<int> &to)
 {
     map<int, Node *> nodesMap;
@@ -49,7 +86,7 @@ int evenForest(int nodes, int edges, vector<int> &from, vector<int> &to)
         parent->Children.push_back(child);
     }
 
-    return 0;
+    return getEvenSubtrees(root);
 }
 
 int main()
