@@ -11,9 +11,11 @@ public:
     Node(int value)
     {
         Value = value;
+        TotalChildren = 0;
     }
     int Value;
     vector<Node *> Children;
+    int TotalChildren;
 };
 
 Node *getOrCreateNode(int value, map<int, Node *> &nodesMap)
@@ -41,7 +43,7 @@ int getEvenSubtrees(Node *node)
 
     if (node->Children.empty())
     {
-        node->Value = 0;
+        node->TotalChildren = 0;
 
         return 0;
     }
@@ -52,19 +54,23 @@ int getEvenSubtrees(Node *node)
     for (Node *subnode : node->Children)
     {
         evenSubtrees += getEvenSubtrees(subnode);
+    }
 
-        if (subnode->Value > 1 && subnode->Value % 2 == 0)
+    for (Node *subnode : node->Children)
+    {
+        int children = subnode->TotalChildren + 1;
+        if (children > 1 && children % 2 == 0)
         {
+            subnode->TotalChildren = 0;
             evenSubtrees++;
-            subnode->Value = 0;
         }
         else
         {
-            totalChildren += subnode->Value + 1;
+            totalChildren += children;
         }
     }
 
-    node->Value = totalChildren;
+    node->TotalChildren += totalChildren;
 
     return evenSubtrees;
 }
