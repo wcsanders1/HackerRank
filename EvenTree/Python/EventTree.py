@@ -1,11 +1,5 @@
 #!/bin/python3
 
-import math
-import os
-import random
-import re
-import sys
-
 
 class Node:
     value = 0
@@ -14,6 +8,8 @@ class Node:
 
     def __init__(self, value):
         self.value = value
+        self.children = []
+        self.total_children = 0
 
 
 def get_or_create_node(value, nodes_map):
@@ -23,17 +19,44 @@ def get_or_create_node(value, nodes_map):
     return nodes_map[value]
 
 
+def get_even_subtrees(node):
+    if node is None:
+        return 0
+
+    if not node.children:
+        node.total_children = 0
+        return 0
+
+    even_subtrees = 0
+    total_children = 0
+
+    for subnode in node.children:
+        even_subtrees += get_even_subtrees(subnode)
+
+    for subnode in node.children:
+        children = subnode.total_children + 1
+        if children > 1 and children % 2 == 0:
+            subnode.total_children = 0
+            even_subtrees += 1
+        else:
+            total_children += children
+
+    node.total_children += total_children
+
+    return even_subtrees
+
+
 def even_forest(t_nodes, t_edges, t_from, t_to):
     root = Node(1)
     nodes_map = {1: root}
 
-    for i in range(t_from):
+    for i in range(len(t_from)):
         child = get_or_create_node(t_from[i], nodes_map)
         parent = get_or_create_node(t_to[i], nodes_map)
 
         parent.children.append(child)
 
-    return 0
+    return get_even_subtrees(root)
 
 
 if __name__ == '__main__':
