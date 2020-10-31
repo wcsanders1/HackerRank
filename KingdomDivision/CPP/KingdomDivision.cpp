@@ -5,27 +5,29 @@
 
 using namespace std;
 
-class Node
+class Kingdom
 {
 public:
-    Node(int label)
+    Kingdom(int label)
     {
         Label = label;
         Value = 0;
+        Visited = false;
     }
     int Label;
     int Value;
-    vector<Node *> Children;
+    bool Visited;
+    vector<Kingdom *> Neighbors;
 };
 
-Node *getOrCreateNode(int value, map<int, Node *> &nodesMap)
+Kingdom *getOrCreateNode(int value, map<int, Kingdom *> &nodesMap)
 {
-    map<int, Node *>::iterator it;
+    map<int, Kingdom *>::iterator it;
     it = nodesMap.find(value);
 
     if (it == nodesMap.end())
     {
-        Node *newNode = new Node(value);
+        Kingdom *newNode = new Kingdom(value);
         nodesMap[value] = newNode;
 
         return newNode;
@@ -34,22 +36,31 @@ Node *getOrCreateNode(int value, map<int, Node *> &nodesMap)
     return it->second;
 }
 
-void getDivisions(Node *node)
+void getDivisions(Kingdom *node)
 {
-    if (!node)
+    if (!node || node->Visited)
     {
         return;
     }
 
-    if (node->Children.empty())
+    node->Visited = true;
+
+    if (node->Neighbors.empty())
     {
         node->Value = 0;
 
         return;
     }
 
-    for (Node *subnode : node->Children)
+    bool hasChildren = false;
+    for (Kingdom *subnode : node->Neighbors)
     {
+        if (subnode->Visited)
+        {
+            continue;
+        }
+
+        hasChildren = true;
         getDivisions(subnode);
 
         if (subnode->Value)
@@ -66,21 +77,25 @@ void getDivisions(Node *node)
         }
     }
 
-    node->Value += 2;
+    if (hasChildren)
+    {
+        node->Value += 2;
+    }
 }
 
 // Complete the kingdomDivision function below.
 int kingdomDivision(int n, vector<vector<int>> roads)
 {
-    map<int, Node *> nodesMap;
+    map<int, Kingdom *> nodesMap;
     vector<vector<int>>::iterator roadsIterator;
     for (roadsIterator = roads.begin(); roadsIterator != roads.end(); roadsIterator++)
     {
         vector<int> road = *roadsIterator;
-        Node *parent = getOrCreateNode(road[0], nodesMap);
-        Node *child = getOrCreateNode(road[1], nodesMap);
+        Kingdom *kingdomOne = getOrCreateNode(road[0], nodesMap);
+        Kingdom *kingdomTwo = getOrCreateNode(road[1], nodesMap);
 
-        parent->Children.push_back(child);
+        kingdomOne->Neighbors.push_back(kingdomTwo);
+        kingdomTwo->Neighbors.push_back(kingdomOne);
     }
 
     getDivisions(nodesMap[1]);
