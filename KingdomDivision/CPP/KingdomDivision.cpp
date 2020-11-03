@@ -5,102 +5,67 @@
 
 using namespace std;
 
-class Kingdom
+#define mod 1000000007;
+
+enum
 {
-public:
-    Kingdom(int label)
-    {
-        Label = label;
-        Value = 0;
-        Visited = false;
-    }
-    int Label;
-    int Value;
-    bool Visited;
-    vector<Kingdom *> Neighbors;
+    safe,
+    unsafe
 };
 
-Kingdom *getOrCreateNode(int value, map<int, Kingdom *> &nodesMap)
+void getDivisions(vector<vector<long> *> *roadsMap, vector<bool> *visited, vector<vector<long> *> *divisions, int index = 0)
 {
-    map<int, Kingdom *>::iterator it;
-    it = nodesMap.find(value);
+    (*visited)[index] = true;
+    long sf = 1;
+    long usf = 1;
 
-    if (it == nodesMap.end())
+    for (long i : *(*roadsMap)[index])
     {
-        Kingdom *newNode = new Kingdom(value);
-        nodesMap[value] = newNode;
-
-        return newNode;
-    }
-
-    return it->second;
-}
-
-void getDivisions(Kingdom *node)
-{
-    if (!node || node->Visited)
-    {
-        return;
-    }
-
-    node->Visited = true;
-
-    if (node->Neighbors.empty())
-    {
-        node->Value = 0;
-
-        return;
-    }
-
-    bool hasChildren = false;
-    for (Kingdom *subnode : node->Neighbors)
-    {
-        if (subnode->Visited)
+        if ((*visited)[i])
         {
             continue;
         }
 
-        hasChildren = true;
-        getDivisions(subnode);
+        getDivisions(roadsMap, visited, divisions, i);
 
-        if (subnode->Value)
-        {
-            if (!node->Value)
-            {
-                node->Value = subnode->Value;
-            }
-            else
-            {
-                int newValue = (node->Value * subnode->Value) % 100000007;
-                node->Value = newValue;
-            }
-        }
+        usf *= (*(*divisions)[i])[safe];
+        usf %= mod;
+
+        sf *= ((*(*divisions)[i])[safe] * 2) + (*(*divisions)[i])[unsafe];
+        sf %= mod;
     }
 
-    if (hasChildren)
-    {
-        node->Value += 2;
-    }
+    sf -= usf;
+    sf += mod;
+    sf %= mod;
+    (*(*divisions)[index])[safe] = sf;
+    (*(*divisions)[index])[unsafe] = usf;
 }
 
-// Complete the kingdomDivision function below.
-int kingdomDivision(int n, vector<vector<int>> roads)
+int kingdomDivision(int n, vector<vector<int>> &roads)
 {
-    map<int, Kingdom *> nodesMap;
-    vector<vector<int>>::iterator roadsIterator;
-    for (roadsIterator = roads.begin(); roadsIterator != roads.end(); roadsIterator++)
-    {
-        vector<int> road = *roadsIterator;
-        Kingdom *kingdomOne = getOrCreateNode(road[0], nodesMap);
-        Kingdom *kingdomTwo = getOrCreateNode(road[1], nodesMap);
+    vector<vector<long> *> *roadsMap = new vector<vector<long> *>(n);
 
-        kingdomOne->Neighbors.push_back(kingdomTwo);
-        kingdomTwo->Neighbors.push_back(kingdomOne);
+    vector<vector<long> *>::iterator it;
+    int i = 0;
+    for (it = roadsMap->begin(); it != roadsMap->end(); it++, i++)
+    {
+        (*roadsMap)[i] = new vector<long>();
     }
 
-    getDivisions(nodesMap[1]);
+    for (vector<int> road : roads)
+    {
+        road[0]--;
+        road[1]--;
+        (*roadsMap)[road[0]]->push_back(road[1]);
+        (*roadsMap)[road[1]]->push_back(road[0]);
+    }
 
-    return nodesMap[1]->Value;
+    vector<vector<long> *> *divisions = new vector<vector<long> *>(n, new vector<long>(2));
+
+    getDivisions(roadsMap, new vector<bool>(n), divisions);
+
+    return (2 * (*(*divisions)[0])[safe]) % mod;
 }
 
 int main()
@@ -111,7 +76,7 @@ int main()
     vector<vector<int>> roads(n - 1);
     for (int i = 0; i < n - 1; i++)
     {
-        roads[i].resize(2);
+        roads[i] = vector<int>(2);
 
         for (int j = 0; j < 2; j++)
         {
