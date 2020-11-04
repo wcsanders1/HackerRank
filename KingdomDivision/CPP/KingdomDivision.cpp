@@ -61,7 +61,12 @@ int kingdomDivision(int n, vector<vector<int>> &roads)
         (*roadsMap)[road[1]]->push_back(road[0]);
     }
 
-    vector<vector<long> *> *divisions = new vector<vector<long> *>(n, new vector<long>(2));
+    vector<vector<long> *> *divisions = new vector<vector<long> *>(n);
+    i = 0;
+    for (it = divisions->begin(); it != divisions->end(); it++, i++)
+    {
+        (*divisions)[i] = new vector<long>(2);
+    }
 
     getDivisions(roadsMap, new vector<bool>(n), divisions);
 
