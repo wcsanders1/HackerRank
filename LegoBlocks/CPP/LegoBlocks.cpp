@@ -7,16 +7,19 @@ using namespace std;
 
 #define mod 1000000007;
 
-vector<string> split_string(string);
-
-/*
- * Complete the legoBlocks function below.
- */
-int legoBlocks(int n, int m)
+int legoBlocks(int height, int width)
 {
-    /*
-     * Write your code here.
-     */
+    int rowCombinations = 1;
+    for (int i = 1; i <= width; i++)
+    {
+        rowCombinations = (rowCombinations * 2) - 1;
+        if (i > 1 && i < 5)
+        {
+            rowCombinations++;
+        }
+    }
+
+    return 0;
 }
 
 int main()
@@ -27,9 +30,6 @@ int main()
 
     for (int t_itr = 0; t_itr < t; t_itr++)
     {
-        string nm_temp;
-        getline(cin, nm_temp);
-
         string nm;
         getline(cin >> ws, nm);
         int n = stoi(nm.substr(0, nm.find(" ")));
