@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <math.h>
 
 using namespace std;
 
@@ -9,24 +10,58 @@ using namespace std;
 
 int legoBlocks(int height, int width)
 {
-    int rowCombinations = 1;
-    for (int i = 1; i <= width; i++)
+    vector<int> rowCombinations;
+    rowCombinations.push_back(0);
+    rowCombinations.push_back(1);
+    if (width > 1)
     {
-        rowCombinations = (rowCombinations * 2) - 1;
-        if (i > 1 && i < 5)
+        rowCombinations.push_back(2);
+    }
+    if (width > 2)
+    {
+        rowCombinations.push_back(4);
+    }
+    if (width > 3)
+    {
+        rowCombinations.push_back(8);
+    }
+
+    if (width > 4)
+    {
+        for (int i = 5; i <= width; i++)
         {
-            rowCombinations++;
+            int c = (rowCombinations[i - 1] + rowCombinations[i - 2] + rowCombinations[i - 3] + rowCombinations[i - 4]) % mod;
+            rowCombinations.push_back(c);
         }
     }
 
-    return 0;
+    vector<int> heightCombinations;
+    for (int i = 0; i < (int)rowCombinations.size(); i++)
+    {
+        int h = (int)(pow(rowCombinations[i], height)) % mod;
+        heightCombinations.push_back(h);
+    }
+
+    vector<int> result(width + 1);
+    result[0] = 0;
+    result[1] = 1;
+
+    for (int i = 2; i <= width; i++)
+    {
+        result[i] = heightCombinations[i];
+        for (int j = 1; j < i; j++)
+        {
+            result[i] = (result[i] - result[j] * heightCombinations[i - j]) % mod;
+        }
+    }
+
+    return (result[result.size() - 1]) % mod;
 }
 
 int main()
 {
     int t;
     cin >> t;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     for (int t_itr = 0; t_itr < t; t_itr++)
     {
