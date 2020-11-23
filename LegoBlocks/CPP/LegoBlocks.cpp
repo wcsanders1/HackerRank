@@ -8,9 +8,31 @@ using namespace std;
 
 #define mod 1000000007;
 
+unsigned long long power(unsigned long long num, int p)
+{
+    if (p == 0)
+    {
+        return 1;
+    }
+
+    if (p == 1)
+    {
+        return num;
+    }
+
+    unsigned long long number = num;
+    for (int i = 2; i <= p; i++)
+    {
+        num *= number;
+        num %= mod;
+    }
+
+    return num;
+}
+
 int legoBlocks(int height, int width)
 {
-    vector<int> rowCombinations;
+    vector<long long> rowCombinations;
     rowCombinations.push_back(0);
     rowCombinations.push_back(1);
     if (width > 1)
@@ -35,27 +57,34 @@ int legoBlocks(int height, int width)
         }
     }
 
-    vector<int> heightCombinations;
-    for (int i = 0; i < (int)rowCombinations.size(); i++)
+    vector<long long> powers;
+    for (int i = 0; i <= width; i++)
     {
-        int h = (int)(pow(rowCombinations[i], height)) % mod;
-        heightCombinations.push_back(h);
+        powers.push_back((long long)power(rowCombinations[i], height));
     }
 
-    vector<int> result(width + 1);
+    vector<long long> result(width + 1);
     result[0] = 0;
     result[1] = 1;
 
     for (int i = 2; i <= width; i++)
     {
-        result[i] = heightCombinations[i];
+        long long sum = 0;
         for (int j = 1; j < i; j++)
         {
-            result[i] = (result[i] - result[j] * heightCombinations[i - j]) % mod;
+            sum += (result[j] * powers[i - j]) % mod;
+            sum %= mod;
         }
+        result[i] = (powers[i] - sum);
+        result[i] = result[i] % mod;
     }
 
-    return (result[result.size() - 1]) % mod;
+    while (result[width] < 0)
+    {
+        result[width] += mod;
+    }
+
+    return result[width];
 }
 
 int main()
