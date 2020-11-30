@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -7,33 +8,21 @@ using namespace std;
 
 long long countArray(int n, int k, int x)
 {
-    long long total = 2;
-    int mult = k - 1;
+    vector<long> oneNotEnd(n + 1, 0);
+    vector<long> oneEnd(n + 1, 0);
 
-    long long isLast;
-    long long notLast;
-    if (x == 1)
+    oneNotEnd[2] = 1;
+    oneEnd[2] = 0;
+
+    for (int i = 3; i <= n; i++)
     {
-        isLast = 0;
-        notLast = mult;
-    }
-    else
-    {
-        isLast = 1;
-        notLast = mult - 1;
+        oneNotEnd[i] = oneEnd[i - 1] + (k - 2) * oneNotEnd[i - 1];
+        oneEnd[i] = (k - 1) * oneNotEnd[i - 1];
+        oneNotEnd[i] %= mod;
+        oneEnd[i] %= mod;
     }
 
-    for (int i = 3; i < n; i++)
-    {
-        long long m = total % mod;
-        total = (m * mult) % mod;
-        total %= mod;
-
-        isLast = notLast % mod;
-        notLast = (total - isLast) % mod;
-    }
-
-    return total - isLast;
+    return x == 1 ? oneEnd[n] : oneNotEnd[n];
 }
 
 int main()
@@ -52,3 +41,5 @@ int main()
 
     return 0;
 }
+
+// 761 99 1 -> 236568308
