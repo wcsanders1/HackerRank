@@ -1,81 +1,62 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstring>
 
+#define LL long long
+#define M 1000000007
 using namespace std;
 
-const int mod = 1000000007;
-const int primeSize = 100000;
+int q, n, f[8200] = {0};
+LL dp[1005][8200] = {0}, cnt[1005] = {0};
+vector<int> primes;
 
-bool primes[primeSize];
-
-void setPrimes()
+void makePrime()
 {
-    for (int i = 0; i < primeSize; i++)
+    f[0] = f[1] = 1;
+    for (int i = 2; i * i < 8200; i++)
     {
-        primes[i] = true;
-    }
-
-    int prime = 2;
-
-    while (prime < primeSize)
-    {
-        int start = pow(prime, 2);
-
-        if (start >= primeSize)
+        if (!f[i])
         {
-            return;
-        }
-
-        while (start < primeSize)
-        {
-            primes[start] = false;
-            start += prime;
-        }
-
-        for (int i = prime + 1; i < mod; i++)
-        {
-            if (primes[i])
-            {
-                prime = i;
-                break;
-            }
+            for (int j = i + i; j < 8200; j += i)
+                f[j] = 1;
         }
     }
+    for (int i = 2; i < 8200; i++)
+        if (!f[i])
+            primes.push_back(i);
 }
 
-long getResult(vector<int> &nums)
-{
-    int result = 0;
-
-    for (int i : nums)
-    {
-        result ^= i;
-    }
-
-    return 0;
-}
-
+// This is not my solution
 int main()
 {
-    setPrimes();
-
-    int q;
     cin >> q;
+    makePrime();
 
-    for (int i = 0; i < q; i++)
+    while (q--)
     {
-        int c;
-        cin >> c;
+        cin >> n;
+        memset(cnt, 0, sizeof(cnt));
+        memset(dp, 0, sizeof(dp));
 
-        vector<int> nums;
-        for (int j = 0; j < c; j++)
+        for (int i = 0, x; i < n; i++)
+            cin >> x, cnt[x - 3500]++;
+
+        dp[0][3500] = (cnt[0] + 1) / 2;
+        dp[0][0] = (cnt[0] + 2) / 2;
+        for (int i = 1; i < 1005; i++)
         {
-            int num;
-            cin >> num;
-            nums.push_back(num);
+            for (int j = 0; j < 8200; j++)
+            {
+                dp[i][j] = (dp[i - 1][j] * ((cnt[i] + 2) / 2) + dp[i - 1][j ^ (i + 3500)] * ((cnt[i] + 1) / 2)) % M;
+            }
         }
-
-        cout << getResult(nums);
+        LL ans = 0;
+        for (int p : primes)
+        {
+            (ans += dp[1004][p]) %= M;
+        }
+        cout << ans % M << endl;
     }
+    return 0;
 }
