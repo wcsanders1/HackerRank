@@ -4,28 +4,30 @@
 
 using namespace std;
 
-long getProfit(vector<int> *shares)
+long long getProfit(vector<int> *shares)
 {
     vector<int> &sharesRef = *shares;
     int shareNum = sharesRef.size();
-    long result = 0;
 
-    for (int i = 0; i < shareNum; i++)
+    if (shareNum < 2)
     {
-        long temp = 0;
-        int share = sharesRef[i];
+        return 0;
+    }
 
-        for (int j = i + 1; j < shareNum; j++)
+    long long result = 0;
+
+    int greatest = sharesRef[shareNum - 1];
+    for (int i = shareNum - 2; i >= 0; i--)
+    {
+        int price = sharesRef[i];
+        if (price > greatest)
         {
-            int price = sharesRef[j];
-            int profit = price - share;
-            if (profit > temp)
-            {
-                temp = profit;
-            }
+            greatest = price;
         }
-
-        result += temp;
+        else
+        {
+            result += (greatest - price);
+        }
     }
 
     return result;
